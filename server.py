@@ -39,6 +39,39 @@ def listar_ofertas_de_placas(potencia_minima_wp: float = 0, marca: str = "") -> 
         return cur.fetchall()
 
 
+@mcp.tool()
+def buscar_tecnicos_credenciados(profissao: str = "", cidade: str = "") -> list[dict]:
+    """Busca técnicos credenciados (afiliados a alguma empresa técnica),
+    com sua profissão e registro. Filtra por nome da profissão e/ou
+    cidade da empresa à qual está afiliado, se informado."""
+    with get_cursor() as cur:
+        cur.execute(
+            """
+            SELECT
+                p.name AS nome_tecnico,
+                comp.trade_name AS empresa_afiliada,
+                ta.affiliation_type AS tipo_afiliacao,
+                prof.name AS profissao,
+                pr.council AS conselho,
+                pr.number AS numero_registro,
+                pr.expiration_date AS validade_registro,
+                addr.city AS cidade
+            FROM technician t
+            JOIN person p ON p.id = t.fk_person
+            JOIN technician_affiliation ta ON ta.fk_technician = t.id
+            JOIN company comp ON comp.id = ta.fk_company
+            JOIN address addr ON addr.id = comp.fk_address
+            LEFT JOIN professional_registration pr ON pr.fk_technician = t.id
+            LEFT JOIN profession prof ON prof.id = pr.fk_profession
+            WHERE (%(profissao)s = '' OR prof.name ILIKE %(profissao)s)
+              AND (%(cidade)s = '' OR addr.city ILIKE %(cidade)s)
+            ORDER BY p.name;
+            """,
+            {"profissao": f"%{profissao}%" if profissao else "", "cidade": f"%{cidade}%" if cidade else ""},
+        )
+        return cur.fetchall()
+
+
 app = mcp.streamable_http_app()
 
 if __name__ == "__main__":

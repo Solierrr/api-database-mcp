@@ -15,3 +15,16 @@ def test_listar_ofertas_de_placas_monta_query_certa():
     fake_cur.execute.assert_called_once()
     params = fake_cur.execute.call_args[0][1]
     assert params["potencia_minima_wp"] == 500
+
+
+def test_buscar_tecnicos_credenciados_filtra_por_profissao():
+    fake_cur = MagicMock()
+    fake_cur.fetchall.return_value = [{"nome_tecnico": "João Silva"}]
+
+    with patch("server.get_cursor") as mock_get_cursor:
+        mock_get_cursor.return_value.__enter__.return_value = fake_cur
+        resultado = server.buscar_tecnicos_credenciados(profissao="eletric")
+
+    assert resultado == [{"nome_tecnico": "João Silva"}]
+    params = fake_cur.execute.call_args[0][1]
+    assert params["profissao"] == "%eletric%"
