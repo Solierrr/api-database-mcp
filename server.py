@@ -2,6 +2,10 @@
 
 import uvicorn
 from mcp.server.mcpserver import MCPServer
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import JSONResponse
+
 from postgres_client import get_cursor
 from settings import settings
 
@@ -72,7 +76,15 @@ def buscar_tecnicos_credenciados(profissao: str = "", cidade: str = "") -> list[
         return cur.fetchall()
 
 
+class ExigirAPIKey(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.headers.get("x-api-key") != settings.MCP_API_KEY:
+            return JSONResponse({"erro": "API key ausente ou inválida"}, status_code=401)
+        return await call_next(request)
+
+
 app = mcp.streamable_http_app()
+app.add_middleware(ExigirAPIKey)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=settings.PORT)
