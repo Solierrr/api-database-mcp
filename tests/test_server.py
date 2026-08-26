@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 from starlette.testclient import TestClient
 
 import server
+from settings import settings
 
 
 def test_listar_ofertas_de_placas_monta_query_certa():
@@ -45,5 +46,5 @@ def test_autenticacao_por_api_key():
         chave_errada = client.post("/mcp", json={}, headers={**accept, "x-api-key": "errada"})
         assert chave_errada.status_code == 401
 
-        chave_certa = client.post("/mcp", json={}, headers={**accept, "x-api-key": "fake"})
+        chave_certa = client.post("/mcp", json={}, headers={**accept, "x-api-key": settings.MCP_API_KEY})
         assert chave_certa.status_code != 401
