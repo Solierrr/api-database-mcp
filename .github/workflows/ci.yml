@@ -13,4 +13,4 @@ jobs:
         with:
           python-version: "3.14"
       - run: pip install -r requirements.txt
-      - run: pytest tests --cov=. --cov-report=xml --junitxml=test-results.xml
+      - run: python -m pytest tests --cov=. --cov-report=xml --junitxml=test-results.xml
