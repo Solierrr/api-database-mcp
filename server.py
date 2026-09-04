@@ -1,7 +1,7 @@
 """Servidor MCP que expõe o Postgres 'Negócio'."""
 
 import uvicorn
-from mcp.server.mcpserver import MCPServer
+from mcp.server.fastmcp import FastMCP
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
@@ -9,7 +9,7 @@ from starlette.responses import JSONResponse
 from postgres_client import get_cursor
 from settings import settings
 
-mcp = MCPServer("solaria-negocio")
+mcp = FastMCP("solaria-negocio")
 
 
 @mcp.tool()
