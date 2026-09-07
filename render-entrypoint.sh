@@ -10,5 +10,5 @@ exec infisical run \
   --token="$INFISICAL_TOKEN" \
   --projectId=2296d19c-5f3b-41e1-afa3-fcde39966a71 \
   --env="${INFISICAL_ENV:-qa}" \
-  --path=/database --path=/mcp \
+  --path=/ \
   -- uvicorn server:app --host 0.0.0.0 --port "$PORT"
